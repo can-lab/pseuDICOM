@@ -39,48 +39,36 @@ If you are working on the compute cluster of the Donders Institute, please follo
    (replace X.X.X with latest release version)
 
 ## Usage
-Example:
+An simple example running pseuDICOM on data from a single session with [default arguments](https://github.com/can-lab/pseuDICOM/blob/c803aa583bcf38c0725be68cdf8774d1de591b2f/pseudicom/_pseudicom.py#L18):
+```
+from pseudicom import pseudonimize_dicoms
+pseudonimize_dicoms("path/to/session_dir")
+```
+
+A more advanced example running pseuDICOM on the data of an entire study with custom arguments:
 ```python
 import os
 import glob
-
 from pseudicom import pseudonimize_dicoms
 
-
-for subject_dir in glob.glob("path/to/study_dir/sub-*"):
-    pseudonimize_dicoms(subject_dir,
-                        run_dir_pattern="[0-9][0-9][0-9]-.+",
-                        anatomy_keywords=["t1","AAHead_Scout"],
-                        tags_to_clear=[
-                            "(0010, 0010)",  # Patient's Name
-                            "(0010, 0030)",  # Patient's Birth Date
-                                       ],
-                        change_dates=True,
-                        make_backup=True)
+for subject_dir in glob.glob("path/to/study_dir/sub*"):
+    for session_dir in glob.glob(os.path.join(subject_dir, "ses-,ri*)):
+          pseudonimize_dicoms(session_dir,
+                              run_dir_pattern=".+-.+",
+                              anatomy_keywords=["t1","AAHead_Scout"],
+                              tags_to_clear=[
+                                  "(0010, 0010)",  # Patient's Name
+                                  "(0010, 0030)",  # Patient's Birth Date
+                                             ],
+                              change_dates=True,
+                              make_backup=True)
 ```
+
 
 ### Donders cluster
 If you are working on the compute cluster of the Donders Institute, please follow the following steps:
 1. Start a new interactive job by running command: `qsub -I -l 'procs=8, mem=64gb, walltime=24:00:00'`
 2. Load the dcm2niix module by running command: `module load dcm2niix`
 3. Activate environment by running command: `source pseudicom_env/bin/activate`
-4. Write script `mystudy_pseudicom.py` with custom workflow; example:
-    ```python
-    import os
-    import glob
-
-    from pseudicom import pseudonimize_dicoms
-
-
-    for subject_dir in glob.glob("path/to/study_dir/sub-*"):
-        pseudonimize_dicoms(subject_dir,
-                            run_dir_pattern="[0-9][0-9][0-9]-.+",
-                            anatomy_keywords=["t1","AAHead_Scout"],
-                            tags_to_clear=[
-                                "(0010, 0010)",  # Patient's Name
-                                "(0010, 0030)",  # Patient's Birth Date
-                                           ],
-                            change_dates=True,
-                            make_backup=True)
-    ```
+4. Write script `mystudy_pseudicom.py` (see above for example)
 6. Run script by running command: `python3 mystudy_pseudicom.py`
