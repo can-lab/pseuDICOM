@@ -10,6 +10,8 @@ This entails two steps:
 
 pseuDICOM will perform both of these steps in one go and, unlike most defacing tools, output the final result again in DICOM format.
 
+<img src="https://user-images.githubusercontent.com/2971539/116867429-73a9eb00-ac0d-11eb-9374-5a96ce25bbd4.png" height="500">
+
 ## Prerequisites
 1. Install [FSL](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/)
 2. Install [MRIcroGL](https://www.nitrc.org/projects/mricrogl/) (includes a binary for dcm2niix)
