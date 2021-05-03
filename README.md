@@ -1,8 +1,8 @@
 # pseuDICOM
-Pseudonimize DICOM images
+Pseudonimize (f)MRI data in DICOM format
 
 ## Introduction
-To share raw (f)MRI DICOM images with other researchers, the data first has to be pseudonimized.
+To share (f)MRI DICOM images with other researchers, the data has to be pseudonimized.
 This entails two steps:
 
 1. **Anonymization of all images** (i.e. removing identifiable personal and potentially identifiable information from the DICOM header)
