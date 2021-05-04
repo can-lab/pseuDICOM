@@ -40,8 +40,9 @@ If you are working on the compute cluster of the Donders Institute, please follo
 
 ## Usage
 An simple example running pseuDICOM on data from a single session with [default arguments](https://github.com/can-lab/pseuDICOM/blob/c803aa583bcf38c0725be68cdf8774d1de591b2f/pseudicom/_pseudicom.py#L18):
-```
+```python
 from pseudicom import pseudonimize_dicoms
+
 pseudonimize_dicoms("path/to/session_dir")
 ```
 
@@ -60,6 +61,8 @@ for subject_dir in glob.glob("path/to/study_dir/sub*"):
                                   "(0010, 0030)",  # Patient's Birth Date
                                              ])
 ```
+
+Please note that pseuDICOM always assumes that DICOM images are organized in dedicated run/series subdirectories!
 
 
 ### Donders cluster
