@@ -36,7 +36,7 @@ If you are working on the compute cluster of the Donders Institute, please follo
    (replace X.X.X with latest release version)
 
 ## Usage
-An simple example running pseuDICOM on data from a single session with [default arguments](https://github.com/can-lab/pseuDICOM/blob/36537098894da82eb57ee278480230682151ac1f/pseudicom/_pseudicom.py#L18):
+An simple example running pseuDICOM on data from a single session with [default arguments](https://github.com/can-lab/pseuDICOM/blob/main/pseudicom/_pseudicom.py#L18):
 ```python
 from pseudicom import pseudonimize_dicoms
 
