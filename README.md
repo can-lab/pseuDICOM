@@ -28,11 +28,12 @@ pseuDICOM will perform both of these steps in one go and, unlike most defacing t
 
 ### Donders cluster
 If you are working on the compute cluster of the Donders Institute, please follow the following steps:
-1. Create new environment in home directory by running command: `cd && python3 -m venv pseudicom_env`
-2. Activate new environment by running command: `source pseudicom_env/bin/activate`
-3. Install Nipype, pydicom, quickshear: `pip3 install nipype pydicom quickshear`
-4. Download [pseuDICOM](https://github.com/can-lab/pseuDICOM/master.zip)
-5. Install with
+1. Load Anaconda3 module by running command: `module load anaconda3`
+2. Create new environment in home directory by running command: `cd && python3 -m venv pseudicom_env`
+3. Activate new environment by running command: `source pseudicom_env/bin/activate`
+4. Install Nipype, pydicom, quickshear: `pip3 install nipype pydicom quickshear`
+5. Download [pseuDICOM](https://github.com/can-lab/pseuDICOM/master.zip)
+6. Install with
    ```
    pip3 install pseuDICOM-X.X.X.zip
    ```
