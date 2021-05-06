@@ -15,11 +15,7 @@ pseuDICOM will perform both of these steps in one go and, unlike most defacing t
 ## Prerequisites
 1. Install [FSL](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/)
 2. Install [MRIcroGL](https://www.nitrc.org/projects/mricrogl/) (includes a binary for dcm2niix)
-3. Update pip and install wheel as well as numpy and nibabel (both needed for quickshear installation)
-   ```
-   pip3 install -U pip wheel numpy nibabel
-   ```
-4. Download [pseuDICOM](https://github.com/can-lab/pseuDICOM/master.zip)
+3. Download [pseuDICOM](https://github.com/can-lab/pseuDICOM/master.zip)
 5. Install with
    ```
    pip3 install pseuDICOM-X.X.X.zip
