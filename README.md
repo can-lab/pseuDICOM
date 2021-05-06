@@ -15,9 +15,9 @@ pseuDICOM will perform both of these steps in one go and, unlike most defacing t
 ## Prerequisites
 1. Install [FSL](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/)
 2. Install [MRIcroGL](https://www.nitrc.org/projects/mricrogl/) (includes a binary for dcm2niix)
-3. Install nipype, pydicom, quickshear
+3. Update pip and install wheel as well as numpy and nibabel (both needed for quickshear installation)
    ```
-   pip3 install nipype pydicom quickshear
+   pip3 install -U pip wheel numpy nibabel
    ```
 4. Download [pseuDICOM](https://github.com/can-lab/pseuDICOM/master.zip)
 5. Install with
@@ -31,7 +31,7 @@ If you are working on the compute cluster of the Donders Institute, please follo
 1. Load Anaconda3 module by running command: `module load anaconda3`
 2. Create new environment in home directory by running command: `cd && python3 -m venv pseudicom_env`
 3. Activate new environment by running command: `source pseudicom_env/bin/activate`
-4. Install Nipype, pydicom, quickshear: `pip3 install nipype pydicom quickshear`
+4. Update pip and install wheel as well as numpy and nibabel (both needed for quickshear installation): `pip3 install -U pip wheel numpy nibabel`
 5. Download [pseuDICOM](https://github.com/can-lab/pseuDICOM/master.zip)
 6. Install with
    ```
