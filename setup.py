@@ -16,9 +16,9 @@ def get_version():
 __version__ = get_version()
 
 setup(
-    name = 'Finish the job',
+    name = 'pseuDICOM',
     version = __version__,
     packages = ['pseudicom'],
     install_requires = ['nipype',
-                        'pseudicom',
+                        'pydicom',
                         'quickshear'])
