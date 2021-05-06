@@ -44,7 +44,7 @@ def pseudonimize_dicoms(directory,
                                        ],
                         change_dates=True,
                         make_backup=True,
-                        base_dir=None):
+                        work_dir=None):
 
     """Psuedonimize DICOM images within a directory.
 
@@ -102,16 +102,16 @@ def pseudonimize_dicoms(directory,
         defacing ("*.bak_deface") in the same directory
         Default:
             True
-    base_dir : str, optional
-        a base directory for the Nipype worklfow
+    work_dir : str, optional
+        a working directory for the Nipype worklfow
         Default:
             None
 
     """
 
     pseudonimize_wf = pe.Workflow('pseudonimize_dicoms')
-    if base_dir is not None:
-        pseudonimize_wf.base_dir = base_dir
+    if work_dir is not None:
+        pseudonimize_wf.base_dir = work_dir
 
     # Select all runs
     def _find_runs(directory, run_dir_pattern):
