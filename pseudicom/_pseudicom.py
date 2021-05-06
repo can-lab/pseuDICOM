@@ -122,7 +122,7 @@ def pseudonimize_dicoms(directory,
             for d in dirs:
                 if re.search(run_dir_pattern, d):
                     out_paths.append(os.path.join(root, d))
-        return out_paths
+        return sorted(out_paths)
 
     find_runs = pe.Node(niu.Function(input_names=["directory",
                                                   "run_dir_pattern"],
@@ -146,7 +146,7 @@ def pseudonimize_dicoms(directory,
         timestamp = datetime.datetime.now()
         today = timestamp.strftime("%Y%m%d")
         for f in files:
-            d = pydicom.read_file(f)
+            d = pydicom.dcmread(f)
             d.remove_private_tags()
             dates = []
             for element in d:
@@ -173,6 +173,8 @@ def pseudonimize_dicoms(directory,
             d.fix_meta_info()
             if make_backup:
                 os.rename(f, f + ".bak_anonym")
+            else:
+                os.remove(f)
             path, name = os.path.split(f)
             for date in dates:
                 if date in name:
@@ -221,14 +223,17 @@ def pseudonimize_dicoms(directory,
 
     # Remove derived, localizer and 2D images
     def _remove_derived(in_files, nii_files):
-        print(len(in_files), len(nii_files))
+        import traits
         in_files_out = []
         nii_files_out = []
+        len_diff = len(in_files) - len(nii_files)
+        if len_diff > 0:  # dcm2niix removes <undefined> at the beginning of the outputs list!
+            in_files = in_files[len_diff:]
         for c,x in enumerate(nii_files):
-            if type(x) == str:
+            if type(x) != traits.trait_base._Undefined:
                 in_files_out.append(in_files[c])
                 nii_files_out.append(x)
-        print(len(in_files_out), len(nii_files_out))
+                
         return in_files_out, nii_files_out
 
     remove_derived = pe.Node(niu.Function(input_names=["in_files",
@@ -251,7 +256,7 @@ def pseudonimize_dicoms(directory,
         img = nb.load(in_file)
         pixel_data = np.flip(img.get_fdata().astype(np.uint16), 2)
         for f in dcm_files:
-            d = pydicom.read_file(f)
+            d = pydicom.dcmread(f)
             slice_nr = int(d.InstanceNumber)
             if make_backup:
                 d.save_as(f + ".bak_deface")
@@ -281,4 +286,3 @@ def pseudonimize_dicoms(directory,
         ])
 
     pseudonimize_wf.run()
-
