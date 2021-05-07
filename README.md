@@ -1,6 +1,8 @@
 # pseuDICOM
 Pseudonimize (f)MRI data in DICOM format
 
+by [Florian Krause](https://www.floriankrause.org/)
+
 ## Introduction
 To share (f)MRI DICOM images with other researchers, the data has to be pseudonimized.
 This entails two steps:
