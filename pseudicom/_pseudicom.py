@@ -92,9 +92,9 @@ def pseudonimize_dicoms(directory,
                 "(0032, 1032)",  # Requesting Physician
                 "(0032, 1060)",  # Requested Procedure Description
             ]
-    change_dates : bool, optional
-        if True, all dates in the DICOM header will be changed to the current
-        date
+    change_dates : bool or str, optional
+        if True, all dates in the DICOM header will be changed to the current;
+        date; if a string is given, all dates will be changed to that string
         Default:
             True
     make_backup : bool, optional
@@ -143,8 +143,11 @@ def pseudonimize_dicoms(directory,
         for f in files:
             if f.endswith("dcm") or f.endswith("IMA"):
                 dicoms.append(f)
-        timestamp = datetime.datetime.now()
-        today = timestamp.strftime("%Y%m%d")
+        if change_dates is True:
+          timestamp = datetime.datetime.now()
+          new_date = timestamp.strftime("%Y%m%d")
+        else:
+          new_date = change_dates
         for f in files:
             d = pydicom.dcmread(f)
             d.remove_private_tags()
@@ -162,13 +165,13 @@ def pseudonimize_dicoms(directory,
                                 for date in dates:
                                     if date in str(e.value):
                                         e.value = str(e.value).replace(date,
-                                                                       today)
+                                                                       new_date)
                                         break
                     elif element.VR in ("DA", "UI"):
                         for date in dates:
                             if date in str(element.value):
                                 element.value = str(element.value).replace(
-                                    date, today)
+                                    date, new_date)
                                 break
             d.fix_meta_info()
             if make_backup:
