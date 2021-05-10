@@ -181,7 +181,7 @@ def pseudonimize_dicoms(directory,
             path, name = os.path.split(f)
             for date in dates:
                 if date in name:
-                    name = name.replace(date, today)
+                    name = name.replace(date, new_date)
                     break
             d.save_as(os.path.join(path, name))
         return in_path
