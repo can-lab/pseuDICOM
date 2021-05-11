@@ -10,7 +10,7 @@ import os
 from nipype.pipeline import engine as pe
 from nipype.interfaces import utility as niu
 from nipype.interfaces.io import DataFinder
-from nipype.interfaces.dcm2nii import Dcm2nii, Dcm2niix
+from nipype.interfaces.dcm2nii import Dcm2niix
 from nipype.interfaces.fsl import BET, maths, utils
 from nipype.interfaces.quickshear import Quickshear
 
@@ -32,17 +32,18 @@ def pseudonimize_dicoms(directory,
                             "(0008, 0023)",  # Content Date
                             "(0008, 0030)",  # Study Time
                             "(0008, 0031)",  # Series Time
+                            "(0008, 0032)",  # Acquisition Time
                             "(0008, 0033)",  # Content Time
                             "(0008, 0050)",  # Accession Number
-                            "(0008, 0070)",  # Manufacturer
+                            #"(0008, 0070)",  # Manufacturer
                             "(0008, 0080)",  # Institution Name
                             "(0008, 0081)",  # Institution Address
                             "(0008, 0090)",  # Referring Physician's Name
                             "(0008, 0092)",  # Referring Physician's Address
                             "(0008, 0094)",  # Referring Physician's Telephone Number
                             "(0008, 1010)",  # Station Name
-                            "(0008, 1030)",  # Study Descripion
-                            "(0008, 103e)",  # Series Description
+                            #"(0008, 1030)",  # Study Descripion
+                            #"(0008, 103e)",  # Series Description
                             "(0008, 1040)",  # Institutional Department Name
                             "(0008, 1048)",  # Physician(s) of Record
                             "(0008, 1050)",  # Performing Physician's Name
@@ -52,7 +53,7 @@ def pseudonimize_dicoms(directory,
                             "(0008, 1090)",  # Manufacturer's Model Name
                             "(0008, 2111)",  # Derivation Description
                             "(0010, 0010)",  # Patient's Name
-                            "(0010, 0020)",  # Patient ID
+                            #"(0010, 0020)",  # Patient ID
                             "(0010, 0021)",  # Issuer of Patient ID
                             "(0010, 0030)",  # Patient's Birth Date
                             "(0010, 0032)",  # Patient's Birth Time
@@ -169,6 +170,7 @@ def pseudonimize_dicoms(directory,
                             "(4008, 4000)",  # Results Comments
                         ],
                         change_dates=True,
+                        remove_private=True,
                         make_backup=True,
                         work_dir=None):
 
@@ -207,17 +209,18 @@ def pseudonimize_dicoms(directory,
                 "(0008, 0023)",  # Content Date
                 "(0008, 0030)",  # Study Time
                 "(0008, 0031)",  # Series Time
+                "(0008, 0032)",  # Acquisition Time
                 "(0008, 0033)",  # Content Time
                 "(0008, 0050)",  # Accession Number
-                "(0008, 0070)",  # Manufacturer
+                #"(0008, 0070)",  # Manufacturer
                 "(0008, 0080)",  # Institution Name
                 "(0008, 0081)",  # Institution Address
                 "(0008, 0090)",  # Referring Physician's Name
                 "(0008, 0092)",  # Referring Physician's Address
                 "(0008, 0094)",  # Referring Physician's Telephone Number
                 "(0008, 1010)",  # Station Name
-                "(0008, 1030)",  # Study Descripion
-                "(0008, 103e)",  # Series Description
+                #"(0008, 1030)",  # Study Descripion
+                #"(0008, 103e)",  # Series Description
                 "(0008, 1040)",  # Institutional Department Name
                 "(0008, 1048)",  # Physician(s) of Record
                 "(0008, 1050)",  # Performing Physician's Name
@@ -227,7 +230,7 @@ def pseudonimize_dicoms(directory,
                 "(0008, 1090)",  # Manufacturer's Model Name
                 "(0008, 2111)",  # Derivation Description
                 "(0010, 0010)",  # Patient's Name
-                "(0010, 0020)",  # Patient ID
+                #"(0010, 0020)",  # Patient ID
                 "(0010, 0021)",  # Issuer of Patient ID
                 "(0010, 0030)",  # Patient's Birth Date
                 "(0010, 0032)",  # Patient's Birth Time
@@ -348,6 +351,11 @@ def pseudonimize_dicoms(directory,
         date; if a string is given, all dates will be changed to that string
         Default:
             True
+    remove_private : bool, optional
+        if True, remove private tags from the DICOM header (i.e. non-standard
+        vendor- specific information)
+        Default:
+            True
     make_backup : bool, optional
         if True, make backups before both anonymizing ("*.bak_anynym") and
         defacing ("*.bak_deface") in the same directory
@@ -384,7 +392,8 @@ def pseudonimize_dicoms(directory,
     find_runs.inputs.run_dir_pattern = run_dir_pattern
 
     # Anonymize DICOMs (MapNode)
-    def _anonymize(in_path, make_backup, tags_to_clear, change_dates):
+    def _anonymize(in_path, make_backup, tags_to_clear, change_dates,
+                   remove_private):
         import os
         import glob
         import datetime
@@ -401,7 +410,8 @@ def pseudonimize_dicoms(directory,
           new_date = change_dates
         for f in files:
             d = pydicom.dcmread(f)
-            d.remove_private_tags()
+            if remove_private:
+                d.remove_private_tags()
             dates = []
             for element in d:
                 if element.VR == "DA":
@@ -413,17 +423,22 @@ def pseudonimize_dicoms(directory,
                     if element.VR == "SQ":
                         for s in element:
                             for e in s:
-                                for date in dates:
-                                    if date in str(e.value):
-                                        e.value = str(e.value).replace(date,
-                                                                       new_date)
+                                if e.VR in ("DA", "DT", "UI"):
+                                    for date in dates:
+                                        if date in str(e.value):
+                                            e.value = str(e.value).replace(
+                                                date, new_date)
                                         break
-                    elif element.VR in ("DA", "UI"):
+                                elif str(e.value) in dates:
+                                    e.value = new_date
+                    elif element.VR in ("DA", "DT", "UI"):
                         for date in dates:
                             if date in str(element.value):
                                 element.value = str(element.value).replace(
                                     date, new_date)
                                 break
+                    elif str(element.value) in dates:
+                        element.value = new_date
             d.fix_meta_info()
             if make_backup:
                 os.rename(f, f + ".bak_anonym")
@@ -439,7 +454,8 @@ def pseudonimize_dicoms(directory,
 
     anonymize = pe.MapNode(niu.Function(input_names=["in_path", "make_backup",
                                                     "tags_to_clear",
-                                                    "change_dates"],
+                                                    "change_dates",
+                                                    "remove_private"],
                                         output_names=["out_path"],
                                         function=_anonymize),
                          iterfield=["in_path"],
@@ -447,6 +463,7 @@ def pseudonimize_dicoms(directory,
     anonymize.inputs.make_backup = make_backup
     anonymize.inputs.tags_to_clear = tags_to_clear
     anonymize.inputs.change_dates = change_dates
+    anonymize.inputs.remove_private = remove_private
 
     # Select anatomy runs (Node)
     def _find_anats(in_paths, keywords):
@@ -471,7 +488,6 @@ def pseudonimize_dicoms(directory,
 
     # Convert DICOM to NIfTI (MapNode)
     converter = pe.MapNode(
-        #Dcm2nii(args= '-x n -r n -p n -e n -f n -d n -g n -i y'),
         Dcm2niix(args= '-x i -i y'),
         name="dcm2nii", iterfield=["source_names"])
 
@@ -487,7 +503,6 @@ def pseudonimize_dicoms(directory,
             if type(x) != traits.trait_base._Undefined:
                 in_files_out.append(in_files[c])
                 nii_files_out.append(x)
-                
         return in_files_out, nii_files_out
 
     remove_derived = pe.Node(niu.Function(input_names=["in_files",
