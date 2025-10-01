@@ -52,7 +52,7 @@ import glob
 from pseudicom import pseudonimize_dicoms
 
 for subject_dir in glob.glob("path/to/study_dir/sub*"):
-    for session_dir in glob.glob(os.path.join(subject_dir, "ses-,ri*)):
+    for session_dir in glob.glob(os.path.join(subject_dir, "ses-mri*")):
           pseudonimize_dicoms(session_dir,
                               anatomy_keywords=["t1","AAHead_Scout"],
                               tags_to_clear=[
