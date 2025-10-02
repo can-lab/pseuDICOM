@@ -439,7 +439,10 @@ def pseudonimize_dicoms(directory,
                                 break
                     elif str(element.value) in dates:
                         element.value = new_date
-            d.fix_meta_info()
+            try:
+              d.fix_meta_info()
+            except AttributeError:  # not needed anymore for pydicom>=3
+              pass
             if make_backup:
                 os.rename(f, f + ".bak_anonym")
             else:
