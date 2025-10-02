@@ -20,5 +20,5 @@ setup(
     version = __version__,
     packages = ['pseudicom'],
     install_requires = ['nipype',
-                        'pydicom',
+                        'pydicom<3',
                         'quickshear'])
